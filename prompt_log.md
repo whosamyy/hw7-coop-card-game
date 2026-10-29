@@ -572,3 +572,136 @@ New planned features include:
 - Deep Dive: A more densely packed map, 3–4 monsters, and shorter visibility duration. 
 - Abyss: 5+ monsters, reduced lighting, longer skill cooldowns, and the removal of key-location indicators (arrows).
 The acceptance criteria have been expanded from 15 to 21 points, covering online synchronization, two-player escape mechanics, monster variety, cosmetic customization, skills, and difficulty-level unlocking. The original four-part structure remains unchanged.
+
+## Phase 2 — Giant squid investigation and search fix
+
+AI tool/model used: Codex, GPT-6-based agent (exact model variant not exposed).
+
+User prompt (verbatim):
+
+```text
+# Context from my IDE setup:
+
+## Active file: prompt_log.md
+
+## Open tabs:
+- prompt_log.md: prompt_log.md
+- game.js: game.js
+
+## My request:
+I reviewed your Phase 2 audit of the inherited Sonar Diver game.
+
+Let's begin implementing Phase 2 in small stages. For this first coding step, focus ONLY on fixing acceptance criterion #7 in `spec.md`.
+
+IMPORTANT:
+
+- Preserve the original student's code and architecture.
+- I must keep at least 75% of the inherited work.
+- Do not rewrite the game from scratch.
+- Do not modify `spec.md`.
+- Do not implement new mechanics outside the specification.
+- Do not implement online co-op, abilities, difficulty levels, or additional monsters yet.
+
+### Task: Fix the giant squid's investigation and search behavior
+
+Your audit found that the squid's seven-second search timer currently starts when sonar is emitted, rather than when the squid reaches the emission location.
+
+Fix this within the existing `game.js` architecture.
+
+Requirements:
+
+1. When the player emits sonar, the squid should investigate the location where the sound was emitted.
+2. Once the squid reaches that location, it should begin searching nearby for approximately seven seconds.
+3. Its search destinations must remain within the four-tile radius specified in `spec.md`.
+4. If the player emits another sonar pulse, the squid should immediately switch to investigating the new location.
+5. After searching, the squid should return to its normal behavior as specified.
+6. Preserve the existing shark behavior, player movement, sonar effects, map generation, and win/loss logic.
+
+### Testing
+
+Test:
+
+- A sonar pulse emitted near the squid.
+- A sonar pulse emitted far from the squid.
+- The squid arriving after more than seven seconds of travel.
+- A new sonar pulse interrupting an existing investigation.
+- Search destinations staying within the allowed radius.
+
+Also run regression checks to make sure existing gameplay still works.
+
+Do not claim browser testing passed unless you actually tested it in a browser.
+
+### Documentation
+
+Append this prompt VERBATIM to `prompt_log.md`, along with the AI tool/model used.
+
+Do not update the final README acceptance-criteria report yet. We will do that after implementing and testing the remaining features.
+
+### When finished
+
+Report:
+
+1. Exactly which files you changed.
+2. What was wrong with the squid behavior.
+3. How you fixed it.
+4. Which tests passed or failed.
+5. Which acceptance criteria are now fully or partially satisfied.
+6. How I can manually test the fix in Chrome.
+
+Do not commit or push.
+
+Then STOP. Do not move on to other features.
+```
+
+## Phase 2 — Game-over and victory freeze fix
+
+AI tool/model used: Codex, GPT-6-based agent (exact model variant not exposed).
+
+User prompt (verbatim, including the truncated final line):
+
+```text
+# Context from my IDE setup:
+
+## Active file: game.js
+
+## Open tabs:
+- game.js: game.js
+- prompt_log.md: prompt_log.md
+
+## My request:
+Continue working on the inherited Sonar Diver game for HW7 Phase 2.
+
+The squid fix for criterion #7 is complete. Now focus ONLY on fixing the game-over and victory freeze behavior for acceptance criteria #12 and #13 in `spec.md`.
+
+Before changing anything, reread those criteria and inspect the existing game loop.
+
+Requirements:
+
+1. When the player collides with either monster, the game should enter its existing GAME OVER state.
+2. When the player collects the key and reaches the unlocked beacon, the game should enter its existing ESCAPE SUCCESSFUL state.
+3. After either result, all gameplay simulation should stop, including:
+   - player movement
+   - monster movement
+   - sonar ray movement and reveal updates
+   - collision and objective updates
+4. Keep the final game screen and result message visible.
+5. The existing R-to-restart behavior must still work and reset all gameplay state.
+6. Do not change the existing game mechanics, graphics, or architecture unnecessarily.
+
+Important:
+
+- Preserve at least 75% of the inherited code.
+- Make small changes within the existing functions.
+- Do not modify `spec.md`.
+- Do not implement multiplayer, abilities, new enemies, or difficulty progression.
+- Do not rewrite existing files.
+
+Testing:
+
+- Verify defeat by the squid.
+- Verify defeat by the shark.
+- Verify victory after collecting the key.
+- Verify sonar no longer advances after either outcome.
+- Verify restarting creates a fresh playable run.
+- Verify
+```

@@ -412,10 +412,14 @@ function sendMonsterTo(targetX, targetY, currentTime) {
   const targetCol = Math.floor(targetX / TILE_SIZE);
   const targetRow = Math.floor(targetY / TILE_SIZE);
   monster.path = findPath(startCol, startRow, targetCol, targetRow);
+  // Finish at the actual sound source, including pulses within the squid's tile.
+  if (isWalkableTile(targetCol, targetRow) && (monster.path.length > 0 || (startCol === targetCol && startRow === targetRow))) {
+    monster.path.push({ x: targetX, y: targetY });
+  }
   monster.isAlerted = monster.path.length > 0;
   monster.mode = "investigating";
-  monster.searchCenter = { col: targetCol, row: targetRow };
-  monster.searchEndsAt = currentTime + MONSTER_SEARCH_TIME;
+  monster.searchCenter = { col: targetCol, row: targetRow, x: targetX, y: targetY };
+  monster.searchEndsAt = 0;
   monster.nextSearchAt = currentTime;
 }
 
@@ -433,6 +437,8 @@ function chooseSearchDestination(currentTime) {
     const radius = 1 + Math.random() * (MONSTER_SEARCH_RADIUS - 1);
     const targetCol = Math.round(monster.searchCenter.col + Math.cos(angle) * radius);
     const targetRow = Math.round(monster.searchCenter.row + Math.sin(angle) * radius);
+    // Rounding to tile centers must not push a destination beyond the sound's radius.
+    if (Math.hypot((targetCol + 0.5) * TILE_SIZE - monster.searchCenter.x, (targetRow + 0.5) * TILE_SIZE - monster.searchCenter.y) > MONSTER_SEARCH_RADIUS * TILE_SIZE) continue;
     if (!isWalkableTile(targetCol, targetRow)) continue;
     const path = findPath(startCol, startRow, targetCol, targetRow);
     if (path.length === 0) continue;
@@ -449,9 +455,17 @@ function chooseSearchDestination(currentTime) {
 function updateMonster(deltaTime, currentTime) {
   if (gameState !== "playing") return;
 
+  if (monster.mode === "searching" && currentTime >= monster.searchEndsAt) {
+    monster.path = [];
+    monster.mode = "idle";
+    monster.isAlerted = false;
+    return;
+  }
+
   if (monster.path.length === 0) {
     if (monster.mode === "investigating") {
       monster.mode = "searching";
+      monster.searchEndsAt = currentTime + MONSTER_SEARCH_TIME;
       monster.nextSearchAt = currentTime;
     }
     if (monster.mode === "searching" && currentTime >= monster.nextSearchAt) {
@@ -470,6 +484,11 @@ function updateMonster(deltaTime, currentTime) {
     monster.x = destination.x;
     monster.y = destination.y;
     monster.path.shift();
+    if (monster.path.length === 0 && monster.mode === "investigating") {
+      monster.mode = "searching";
+      monster.searchEndsAt = currentTime + MONSTER_SEARCH_TIME;
+      monster.nextSearchAt = currentTime;
+    }
     if (monster.path.length === 0 && monster.mode === "searching") {
       monster.nextSearchAt = currentTime + 300;
     }
@@ -562,6 +581,8 @@ function resetGame() {
 }
 
 function updateSonar(currentTime) {
+  if (gameState !== "playing") return;
+
   for (const pulse of sonarPulses) {
     const elapsedSeconds = Math.min((currentTime - pulse.lastUpdatedAt) / 1000, 0.05);
     pulse.lastUpdatedAt = currentTime;
@@ -1279,6 +1300,11 @@ let previousTime = performance.now();
 function gameLoop(currentTime) {
   const deltaTime = Math.min((currentTime - previousTime) / 1000, 0.05);
   previousTime = currentTime;
+  // Preserve the completed result frame while still allowing R to restart.
+  if (gameState !== "playing") {
+    requestAnimationFrame(gameLoop);
+    return;
+  }
   updatePlayer(deltaTime);
   updateMonster(deltaTime, currentTime);
   updateHunter(deltaTime, currentTime);
