@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sonar Diver — Map Prototype</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="game-shell">
+      <header>
+        <p class="eyebrow">MAP PROTOTYPE</p>
+        <h1>SONAR DIVER</h1>
+        <p>Dive from the surface, cross the deep basin, and locate the hidden rescue beacon.</p>
+      </header>
+
+      <canvas
+        id="gameCanvas"
+        width="1120"
+        height="680"
+        aria-label="Sonar Diver maze game"
+      ></canvas>
+
+      <footer>
+        <span><strong>Move</strong> WASD / Arrow Keys</span>
+        <span><strong>Sonar</strong> Space</span>
+        <span><strong>Music</strong> M to mute</span>
+        <span><strong>Restart</strong> R after game over</span>
+        <span><strong>Goal</strong> Find the access key, then reach the rescue beacon</span>
+      </footer>
+    </main>
+
+    <script src="game.js"></script>
+  </body>
+</html>
