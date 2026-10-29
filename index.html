@@ -14,6 +14,17 @@
         <p>Dive from the surface, cross the deep basin, and locate the hidden rescue beacon.</p>
       </header>
 
+      <div id="abilitySetup">
+        <label for="abilitySelect">Ability</label>
+        <select id="abilitySelect">
+          <option value="boost">Speed Boost</option>
+          <option value="blink" disabled>Short Blink (unavailable)</option>
+          <option value="shield" disabled>Emergency Shield (unavailable)</option>
+        </select>
+        <button id="startRun" type="button">Start run</button>
+      </div>
+      <p id="abilityStatus" aria-live="polite">Boost: E · 1.8× speed for 2 seconds · 10-second cooldown</p>
+
       <canvas
         id="gameCanvas"
         width="1120"
@@ -24,6 +35,7 @@
       <footer>
         <span><strong>Move</strong> WASD / Arrow Keys</span>
         <span><strong>Sonar</strong> Space</span>
+        <span><strong>Ability</strong> E</span>
         <span><strong>Music</strong> M to mute</span>
         <span><strong>Restart</strong> R after game over</span>
         <span><strong>Goal</strong> Find the access key, then reach the rescue beacon</span>

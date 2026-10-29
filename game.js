@@ -153,7 +153,39 @@ const camera = { x: 0, y: 0 };
 const sonarPulses = [];
 const revealedTiles = new Map();
 let sonarReadyAt = 0;
-let gameState = "playing";
+let gameState = "ready";
+// Add Blink and Shield definitions/activation branches here in a later step.
+const abilityDefinitions = { boost: { multiplier: 1.8, duration: 2000, cooldown: 10000 } };
+let selectedAbility = "boost";
+let abilityActiveUntil = 0;
+let abilityReadyAt = 0;
+const abilitySelect = document.querySelector("#abilitySelect");
+const abilityStatus = document.querySelector("#abilityStatus");
+document.querySelector("#startRun").addEventListener("click", () => {
+  if (gameState !== "ready" || !abilityDefinitions[abilitySelect.value]) return;
+  selectedAbility = abilitySelect.value;
+  document.querySelector("#abilitySetup").hidden = true;
+  keysDown.clear();
+  previousTime = performance.now();
+  gameState = "playing";
+  startMusic();
+});
+
+function activateAbility(currentTime) {
+  if (gameState !== "playing" || currentTime < abilityReadyAt) return;
+  if (selectedAbility === "boost") {
+    abilityActiveUntil = currentTime + abilityDefinitions.boost.duration;
+    abilityReadyAt = currentTime + abilityDefinitions.boost.cooldown;
+  }
+}
+
+function updateAbilityStatus(currentTime) {
+  const text = gameState === "ready" ? "Boost: E · 1.8× speed for 2 seconds · 10-second cooldown"
+    : currentTime < abilityActiveUntil ? "Boost ACTIVE [E]"
+    : currentTime < abilityReadyAt ? `Boost [E]: ${((abilityReadyAt - currentTime) / 1000).toFixed(1)} s`
+    : "Boost READY [E]";
+  if (abilityStatus.textContent !== text) abilityStatus.textContent = text;
+}
 let keyHintAngle = 0;
 let keyHintUntil = 0;
 let lockedMessageUntil = 0;
@@ -254,7 +286,8 @@ window.addEventListener("keydown", (event) => {
     event.preventDefault();
     if (!event.repeat) triggerSonar(performance.now());
   }
-  if (key === "r" && gameState !== "playing") resetGame();
+  if (key === "r" && (gameState === "won" || gameState === "lost")) resetGame();
+  if (key === "e" && !event.repeat) activateAbility(performance.now());
   if (key === "m" && !event.repeat) toggleMusic();
 });
 window.addEventListener("keyup", (event) => keysDown.delete(event.key.toLowerCase()));
@@ -276,7 +309,7 @@ function canStandAt(x, y) {
   ].every(([pointX, pointY]) => !isWallAt(pointX, pointY));
 }
 
-function updatePlayer(deltaTime) {
+function updatePlayer(deltaTime, currentTime = performance.now()) {
   if (gameState !== "playing") return;
   let dx = 0;
   let dy = 0;
@@ -292,7 +325,10 @@ function updatePlayer(deltaTime) {
     player.heading = Math.atan2(dy, dx);
   }
 
-  const distance = PLAYER_SPEED * deltaTime;
+  // Split frames at the Boost deadline so its final frame only gets the remaining boost.
+  const boostedTime = selectedAbility === "boost"
+    ? Math.max(0, (Math.min(currentTime, abilityActiveUntil) - Math.max(currentTime - deltaTime * 1000, abilityActiveUntil - abilityDefinitions.boost.duration)) / 1000) : 0;
+  const distance = PLAYER_SPEED * (deltaTime + boostedTime * (abilityDefinitions.boost.multiplier - 1));
   const nextX = player.x + dx * distance;
   const nextY = player.y + dy * distance;
   if (canStandAt(nextX, player.y)) player.x = nextX;
@@ -575,6 +611,8 @@ function resetGame() {
   sonarPulses.length = 0;
   revealedTiles.clear();
   sonarReadyAt = 0;
+  abilityActiveUntil = 0;
+  abilityReadyAt = 0;
   keysDown.clear();
   gameState = "playing";
   updateCamera();
@@ -1108,7 +1146,7 @@ function drawLockedMessage(currentTime) {
 }
 
 function drawResultScreen() {
-  if (gameState === "playing") return;
+  if (gameState !== "won" && gameState !== "lost") return;
   const won = gameState === "won";
   context.fillStyle = "rgba(0, 5, 10, .82)";
   context.fillRect(0, 0, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
@@ -1301,11 +1339,11 @@ function gameLoop(currentTime) {
   const deltaTime = Math.min((currentTime - previousTime) / 1000, 0.05);
   previousTime = currentTime;
   // Preserve the completed result frame while still allowing R to restart.
-  if (gameState !== "playing") {
+  if (gameState === "won" || gameState === "lost") {
     requestAnimationFrame(gameLoop);
     return;
   }
-  updatePlayer(deltaTime);
+  updatePlayer(deltaTime, currentTime);
   updateMonster(deltaTime, currentTime);
   updateHunter(deltaTime, currentTime);
   updateSonar(currentTime);
@@ -1334,6 +1372,7 @@ function gameLoop(currentTime) {
   drawDepthDisplay();
   drawLockedMessage(currentTime);
   drawResultScreen();
+  updateAbilityStatus(currentTime);
   requestAnimationFrame(gameLoop);
 }
 

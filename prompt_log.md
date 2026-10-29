@@ -705,3 +705,74 @@ Testing:
 - Verify restarting creates a fresh playable run.
 - Verify
 ```
+
+## Phase 2 — Ability selection and Speed Boost
+
+AI tool/model used: Codex, GPT-6-based agent (exact model variant not exposed).
+
+Implementation choices for unspecified details: E activates the selected ability; cooldown runs from activation; R retains the selection and clears ability timers. Blink and Shield are unavailable placeholders only. Node logic tests passed; no browser tests were performed. The previous game-over-freeze prompt was already present and was not duplicated.
+
+User prompt (verbatim):
+
+```text
+# Context from my IDE setup:
+
+## Active file: game.js
+
+## Open tabs:
+- game.js: game.js
+- prompt_log.md: prompt_log.md
+
+## My request:
+Continue HW7 Phase 2 development of Sonar Diver.
+
+The squid search and end-game freeze fixes are complete.
+
+Now begin implementing acceptance criterion #20 from `spec.md`, focusing ONLY on ability selection and the Boost ability.
+
+First, read the exact rules and priorities for criterion #20 in `spec.md`.
+
+Requirements:
+
+1. Add the smallest necessary UI for selecting a player ability before a run.
+2. Implement Boost exactly as specified, including its activation, effect, duration, and cooldown.
+3. Reuse the existing player movement and collision logic.
+4. Make sure Boost cannot move the player through reefs, walls, or the seafloor.
+5. Make sure Boost does not activate after victory or defeat.
+6. Ensure restarting behaves consistently with the original specification.
+7. Leave clear extension points for Blink and Shield, but DO NOT implement them in this step.
+
+Important:
+
+- Preserve the inherited game's architecture and at least 75% of the original work.
+- Do not rewrite `game.js` or reorganize the entire project.
+- Do not change `spec.md`.
+- Do not alter the squid, shark, sonar, map generation, or existing win/loss behavior unnecessarily.
+- Do not invent ability rules that are missing from the specification. Report any ambiguity instead.
+
+Testing:
+
+- Ability selection works.
+- Boost activates correctly.
+- Boost follows the specified duration and cooldown.
+- Boost respects terrain collision.
+- Normal movement still works.
+- Existing sonar and monster behavior still work.
+- Victory, defeat, and restart still work.
+
+Clearly distinguish automated tests from browser tests.
+
+Append this prompt verbatim to `prompt_log.md`. Also check whether my previous game-over-freeze prompt was logged, and append it verbatim if missing and available in our Codex conversation.
+
+After implementation, report:
+
+- Files changed
+- Features implemented
+- Tests passed and failed
+- Updated criterion #20 status
+- Exact instructions to test Boost manually
+
+Do not commit or push.
+
+Then STOP.
+```
