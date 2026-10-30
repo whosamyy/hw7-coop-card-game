@@ -154,13 +154,17 @@ const sonarPulses = [];
 const revealedTiles = new Map();
 let sonarReadyAt = 0;
 let gameState = "ready";
-// Add Blink and Shield definitions/activation branches here in a later step.
-const abilityDefinitions = { boost: { multiplier: 1.8, duration: 2000, cooldown: 10000 } };
+const abilityDefinitions = {
+  boost: { multiplier: 1.8, duration: 2000, cooldown: 10000 },
+  blink: { range: 3, cooldown: 15000 },
+  shield: { duration: 2000, cooldown: 20000 },
+};
 let selectedAbility = "boost";
 let abilityActiveUntil = 0;
 let abilityReadyAt = 0;
 const abilitySelect = document.querySelector("#abilitySelect");
 const abilityStatus = document.querySelector("#abilityStatus");
+abilitySelect.addEventListener("change", () => updateAbilityStatus(performance.now()));
 document.querySelector("#startRun").addEventListener("click", () => {
   if (gameState !== "ready" || !abilityDefinitions[abilitySelect.value]) return;
   selectedAbility = abilitySelect.value;
@@ -176,14 +180,37 @@ function activateAbility(currentTime) {
   if (selectedAbility === "boost") {
     abilityActiveUntil = currentTime + abilityDefinitions.boost.duration;
     abilityReadyAt = currentTime + abilityDefinitions.boost.cooldown;
+  } else if (selectedAbility === "blink") {
+    const dx = Math.cos(player.heading);
+    const dy = Math.sin(player.heading);
+    let landing = null;
+    // Only cross open water; retain the furthest whole-tile landing before an obstacle.
+    for (let distance = 4; distance <= abilityDefinitions.blink.range * TILE_SIZE; distance += 4) {
+      const x = player.x + dx * distance;
+      const y = player.y + dy * distance;
+      if (!canStandAt(x, y)) break;
+      if (distance % TILE_SIZE === 0) landing = { x, y };
+    }
+    if (!landing) return;
+    player.x = landing.x;
+    player.y = landing.y;
+    abilityReadyAt = currentTime + abilityDefinitions.blink.cooldown;
+  } else if (selectedAbility === "shield") {
+    abilityActiveUntil = currentTime + abilityDefinitions.shield.duration;
+    abilityReadyAt = currentTime + abilityDefinitions.shield.cooldown;
   }
 }
 
 function updateAbilityStatus(currentTime) {
-  const text = gameState === "ready" ? "Boost: E · 1.8× speed for 2 seconds · 10-second cooldown"
-    : currentTime < abilityActiveUntil ? "Boost ACTIVE [E]"
-    : currentTime < abilityReadyAt ? `Boost [E]: ${((abilityReadyAt - currentTime) / 1000).toFixed(1)} s`
-    : "Boost READY [E]";
+  const ability = gameState === "ready" ? abilitySelect.value : selectedAbility;
+  const name = ability === "shield" ? "Shield" : ability === "blink" ? "Blink" : "Boost";
+  const text = gameState === "ready" ? (ability === "blink"
+    ? "Blink: E · up to 3 open tiles ahead · 15-second cooldown"
+    : ability === "shield" ? "Shield: E · blocks one collision within 2 seconds · 20-second cooldown"
+    : "Boost: E · 1.8× speed for 2 seconds · 10-second cooldown")
+    : currentTime < abilityActiveUntil ? `${name} ACTIVE [E]`
+    : currentTime < abilityReadyAt ? `${name} [E]: ${((abilityReadyAt - currentTime) / 1000).toFixed(1)} s`
+    : `${name} READY [E]`;
   if (abilityStatus.textContent !== text) abilityStatus.textContent = text;
 }
 let keyHintAngle = 0;
@@ -568,7 +595,12 @@ function checkGameOutcome(currentTime) {
   const exitY = (exitTile.row + 0.5) * TILE_SIZE;
   const searcherContact = Math.hypot(player.x - monster.x, player.y - monster.y) <= PLAYER_RADIUS + MONSTER_RADIUS;
   const hunterContact = Math.hypot(player.x - hunter.x, player.y - hunter.y) <= PLAYER_RADIUS + HUNTER_RADIUS;
-  const monsterContact = searcherContact || hunterContact;
+  let monsterContacts = Number(searcherContact) + Number(hunterContact);
+  if (monsterContacts > 0 && selectedAbility === "shield" && currentTime < abilityActiveUntil) {
+    // One contact consumes the shield; continued overlap is unprotected next frame.
+    abilityActiveUntil = 0;
+    monsterContacts -= 1;
+  }
   const reachedExit = Math.hypot(player.x - exitX, player.y - exitY) <= PLAYER_RADIUS + 11;
   const reachedKey = !keyItem.collected && Math.hypot(player.x - keyItem.x, player.y - keyItem.y) <= PLAYER_RADIUS + 11;
 
@@ -578,7 +610,7 @@ function checkGameOutcome(currentTime) {
   }
 
   // Monster contact takes priority if both events occur in the same frame.
-  if (monsterContact) gameState = "lost";
+  if (monsterContacts > 0) gameState = "lost";
   else if (reachedExit && keyItem.collected) gameState = "won";
   else if (reachedExit) lockedMessageUntil = currentTime + 1200;
 }

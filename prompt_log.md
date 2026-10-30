@@ -776,3 +776,417 @@ Do not commit or push.
 
 Then STOP.
 ```
+
+## Phase 2 — Short Blink
+
+AI tool/model used: Codex, GPT-6-based agent (exact model variant not exposed).
+
+The specification does not explicitly resolve crossing solid terrain. This implementation interprets “open tiles” as a clear route: the furthest valid whole-tile landing, up to three tiles ahead, checked with existing terrain collision. Failed activation consumes no cooldown. Node logic tests passed; no actual browser tests were performed.
+
+User prompt (verbatim):
+
+```text
+# Context from my IDE setup:
+
+## Active file: game.js
+
+## Open tabs:
+- game.js: game.js
+- prompt_log.md: prompt_log.md
+
+## My request:
+Continue working on my inherited Sonar Diver game for CMU HW7 Phase 2.
+
+Speed Boost and the pre-run ability selection are now implemented. I want to work on the next part of acceptance criterion #20: **Blink**.
+
+First, reread `spec.md` and identify the exact Blink requirements. Follow those rules rather than inventing new mechanics.
+
+### Task
+
+Implement ONLY Blink within the existing game architecture.
+
+1. Make Blink selectable in the existing pre-run ability menu.
+2. Implement its activation behavior, teleportation rules, and cooldown exactly as described in `spec.md`.
+3. Reuse the existing ability system and E activation key where appropriate.
+4. Ensure the teleport destination is valid according to the specification and existing terrain/collision rules.
+5. If a teleport would be invalid, handle it safely without placing the player inside a wall, reef, seafloor, or outside the arena.
+6. Make sure Blink cannot activate during cooldown or after the game has ended.
+7. Ensure restarting properly resets Blink's ability state.
+8. Keep Speed Boost working exactly as before.
+9. Leave Shield unimplemented for now.
+
+### Important
+
+- Preserve at least 75% of the original student's code.
+- Do not rewrite or reorganize the project.
+- Make small, targeted changes to existing functions.
+- Do not change `spec.md`.
+- Do not change squid, shark, sonar, map generation, or win/loss mechanics unless absolutely necessary.
+- Do not add features outside the original specification.
+
+### Testing
+
+Test:
+
+- Blink selection and activation.
+- Normal teleport behavior.
+- Invalid teleport destinations near reefs, boundaries, and the seafloor.
+- Cooldown behavior.
+- Activation after victory or defeat.
+- Restart/reset behavior.
+- Speed Boost regression.
+- Sonar, squid, shark, key collection, and victory/defeat regression.
+
+Clearly distinguish automated tests from actual browser tests.
+
+### Documentation
+
+Append this prompt verbatim to `prompt_log.md`, including the AI tool/model used.
+
+Do not update the final README yet.
+
+### When finished
+
+Report:
+
+1. Files changed.
+2. Exact Blink behavior implemented.
+3. Tests passed and failed.
+4. How I can manually test Blink in Chrome.
+5. Updated acceptance criterion #20 status.
+
+Do not commit or push.
+
+Then STOP. Do not implement Shield or any other new features.
+```
+
+## Phase 2 — Emergency Shield
+
+AI tool/model used: Codex, GPT-6-based agent (exact model variant not exposed).
+
+Shield ignores one monster contact within two seconds and has a twenty-second cooldown measured from activation. The spec does not define sustained overlap or simultaneous contacts. The smallest interpretation using the existing per-frame collision checks consumes protection on the first contact; another frame of overlap can cause defeat, and simultaneous contact with both monsters leaves one unprotected collision. No extra invulnerability period was added. All executed Node logic test groups passed; no actual Chrome browser tests were performed.
+
+User prompt (verbatim):
+
+```text
+# Context from my IDE setup:
+
+## Active file: game.js
+
+## Open tabs:
+- game.js: game.js
+- prompt_log.md: prompt_log.md
+
+## My request:
+Continue my CMU HW7 Phase 2 project, Sonar Diver.
+
+Speed Boost and Short Blink are implemented and tested with Node. Now I want to finish acceptance criterion #20 by implementing the final ability: **Shield**.
+
+First, reread `spec.md` carefully and follow its exact Shield requirements.
+
+### Task
+
+Implement ONLY Shield within the existing game architecture.
+
+1. Make Shield selectable in the existing pre-run ability menu.
+2. Implement Shield's activation, protection behavior, duration, and cooldown exactly as described in `spec.md`.
+3. Reuse the existing E activation key and ability system.
+4. Integrate Shield with the existing monster collision and game-over logic.
+5. Ensure Shield works correctly against both the giant squid and the shark, according to the specification.
+6. Clearly show when Shield is active and when it is on cooldown.
+7. Block activation during cooldown or after the game ends.
+8. Make sure R resets Shield's state properly.
+9. Keep Speed Boost and Blink working exactly as before.
+
+If the spec leaves any Shield behavior unclear, identify the ambiguity and choose the smallest reasonable interpretation without adding unrelated mechanics. Explain your choice.
+
+### Important
+
+- Preserve at least 75% of the original student's code.
+- Make small, targeted changes.
+- Do not rewrite or reorganize the project.
+- Do not modify `spec.md`.
+- Do not implement multiplayer, difficulty levels, customization, or additional monsters.
+- Preserve the existing sonar, squid, shark, key, and victory mechanics.
+
+### Testing
+
+Test:
+
+- Shield selection and activation.
+- Shield protection against both monsters.
+- Shield duration and cooldown.
+- Collision with monsters when Shield is inactive.
+- Repeated contact with monsters while Shield is active, according to the spec.
+- Activation after victory or defeat.
+- Restart behavior.
+- Boost and Blink regression.
+- Squid investigation/search regression.
+- Sonar, key collection, victory, and game-over regression.
+
+Clearly distinguish Node tests from actual Chrome browser tests.
+
+### Documentation
+
+Append this entire prompt verbatim to `prompt_log.md`, including the AI tool/model used.
+
+Do not update the final README yet.
+
+### When finished
+
+Report:
+
+1. Files changed.
+2. Exactly how Shield works.
+3. Any ambiguities you resolved.
+4. Tests passed or failed.
+5. Whether criterion #20 is now fully satisfied.
+6. How I can test Shield manually in Chrome.
+
+Do not commit or push.
+
+Then STOP. Do not implement any additional features.
+```
+
+## Phase 2 — Process summary and documentation review
+
+AI tool/model: Codex, GPT-6-based agent; the exact model variant was not exposed. The inherited Phase 1 transcript does not explicitly identify its model, so no Phase 1 model name has been inferred.
+
+Work proceeded in small stages: read/run audit without edits; squid arrival/search fix; frozen result frames; selection and Boost; Blink; Shield; final README review. The implementation prompts for those coding stages are preserved verbatim above. Node logic checks used temporary DOM/Canvas stubs, plus syntax and whitespace checks. They were not actual browser tests or a committed test suite. The browser automation initialization and initial local server attempt failed in this environment. No successful Chrome playthrough is claimed.
+
+### Actual unwanted AI behavior and correction
+
+The freeze-fix prompt was initially left out of this log. The user noticed the logging gap and asked, verbatim:
+
+```text
+# Context from my IDE setup:
+
+## Active file: game.js
+
+## Open tabs:
+- game.js: game.js
+- prompt_log.md: prompt_log.md
+
+## My request:
+have u been updating prompt log
+```
+
+Codex answered:
+
+> I appended your full squid-fix prompt verbatim to `prompt_log.md`, including the AI tool/model used.
+>
+> I **haven’t appended the freeze-fix prompt yet**. The log is current through the squid fix only.
+
+The user then instructed, verbatim:
+
+```text
+# Context from my IDE setup:
+
+## Active file: game.js
+
+## Open tabs:
+- game.js: game.js
+- prompt_log.md: prompt_log.md
+
+## My request:
+ok do it
+```
+
+Codex corrected the omission by appending the original freeze-fix prompt, including its truncated final “Verify” line. That entry is present above. This is a real documentation lapse and user correction from Phase 2, not a fabricated code failure. Later ability prompts explicitly required logging and were appended at each stage.
+
+For author credit, the user supplied the original source URL: https://github.com/kewuan-lyk/-Jack-Li-.CoopCardGame. Read-only checks found the commit author name `kewuan-lyk`, no GitHub profile display name, and no personal-name credit in its README. The updated README links the source and credits the verified identity, while stating that personal-name confirmation is still needed. No name was guessed from the inherited local paths.
+
+Final documentation prompt (verbatim):
+
+```text
+# Context from my IDE setup:
+
+## Active file: game.js
+
+## Open tabs:
+- game.js: game.js
+- prompt_log.md: prompt_log.md
+
+## My request:
+I'm finishing CMU HW7 Phase 2 for the inherited Sonar Diver project.
+
+All three abilities (Boost, Blink, Shield) have been implemented. I now want to focus ONLY on preparing the final documentation.
+
+Before editing, read:
+
+- The original `spec.md` (all 21 acceptance criteria)
+- The current `README.md`
+- `prompt_log.md`
+- The actual implementation in `game.js`, `index.html`, and `style.css`
+
+### 1. Update README.md
+
+Keep it accurate, clear, and natural, like a college student wrote it.
+
+Include:
+
+- Credit to the original student by name, using the original repository's documented author information. Do not guess the name.
+- A short explanation of Sonar Diver.
+- How to run and play the game.
+- Controls, including the three abilities.
+- Code structure and important functions.
+- Known bugs, limitations, and shortcuts.
+- What should be implemented next.
+
+Most importantly, include a table for ALL 21 acceptance criteria from `spec.md`.
+
+For each criterion, include:
+
+- Number
+- Brief requirement
+- Status (Met / Partial / Not Met)
+- A short explanation of what works or is still missing.
+
+Accurately reflect the current implementation.
+
+Do not mark features as fully browser-tested when only Node tests were performed. Clearly distinguish automated test results from manual browser verification.
+
+Do not claim online co-op, extra monsters, cosmetics, or difficulty levels are finished.
+
+### 2. Check prompt_log.md
+
+Confirm it includes:
+
+- The AI tools/models used.
+- Important Phase 2 prompts verbatim.
+- A clear record of the development process.
+
+The assignment also requires at least one real example of AI doing something unwanted and how I handled it.
+
+Check the existing development history for an actual example. If there isn't one, tell me instead of inventing one.
+
+### 3. Important restrictions
+
+- Do NOT modify `spec.md`.
+- Do NOT modify the game code.
+- Do NOT create or write `HANDOFF_REPORT.md`. I must write that file myself without AI.
+- Do NOT invent test results or undocumented features.
+- Do NOT commit or push.
+
+After finishing:
+
+1. Show which files you changed.
+2. Summarize the acceptance criteria statuses.
+3. Identify anything I still need to verify manually.
+4. Tell me whether the README and prompt log meet the assignment requirements.
+
+Then STOP.
+```
+
+### Initial Phase 2 audit prompt (backfilled from this conversation)
+
+This read-only audit prompt preceded the coding stages above. It is recorded here to complete the important Phase 2 prompt history; it was not appended during the original no-documentation-edit step.
+
+```text
+I'm working on CMU 15-113 HW7 Phase 2. I inherited this cooperative card game from another student, and my job is to continue developing it based on their original specification.
+
+
+
+This is the link to the full instructions. Read it carefully:
+
+[https://www.cs.cmu.edu/\~113/hw7.html](https://www.cs.cmu.edu/~113/hw7.html)
+
+
+
+The original code has already been committed and pushed to my own GitHub repository:
+
+[https://github.com/whosamyy/hw7-coop-card-game](https://github.com/whosamyy/hw7-coop-card-game)
+
+**Important assignment rules:**
+
+- `SPEC.md` is the source of truth.
+- I must preserve at least 75% of the original student's code.
+- Do not rewrite the project from scratch.
+- Do not change the original game's intended mechanics or design.
+- Follow the existing architecture and coding style as much as possible.
+- I have approximately 2 hours for Phase 2.
+- I need to document my changes and development process.
+
+**For this first step, DO NOT modify any files or implement anything yet.**
+
+Please do the following:
+
+1. Read `SPEC.md` carefully, including the game's rules, features, acceptance criteria, and priorities.
+2. Read `README.md`, `prompt_log.md`, and all relevant source files to understand what the original student built.
+3. Explain the game to me in simple terms:
+   - What is the game about?
+   - How do you play it?
+   - What are the controls?
+   - How do you win or lose?
+   - What makes the game interesting?
+4. Examine the current implementation and explain:
+   - Which features already work
+   - Which features are partially implemented
+   - Which features are missing
+   - Any bugs or incomplete functionality
+5. Run the existing game following the README instructions. Test what currently works, without modifying the original code. If browser testing is unavailable, explain what could not be verified.
+6. Go through EVERY numbered acceptance criterion in `SPEC.md` and create a table showing:
+   - Criterion number
+   - What it requires
+   - Status: Complete / Partial / Missing / Broken
+   - What needs to be done
+7. Explain the project structure, including what the important files do and which files should be extended for future features.
+8. Based on the original specification's priorities and my limited time, recommend a realistic implementation plan broken into small stages. Prioritize completing the actual gameplay before visual polish.
+9. Identify the best FIRST coding task that would make meaningful progress without rewriting existing code.
+
+**Important:**
+
+- Do not create new features outside `SPEC.md`.
+- Do not modify `SPEC.md`.
+- Do not delete or replace existing code.
+- Do not create or edit documentation yet.
+- Do not commit or push anything.
+- Do not start implementation until I approve the plan.
+- Clearly distinguish things you actually tested from things you only inferred by reading code.
+
+When finished, give me your findings and proposed implementation stages.
+
+Then STOP and wait for my next prompt.
+```
+
+## Phase 2 — Light-pink page theme
+
+AI tool/model: Codex, GPT-6-based agent (exact model variant not exposed).
+
+User request (verbatim):
+
+```text
+# Context from my IDE setup:
+
+## Active file: game.js
+
+## Open tabs:
+- game.js: game.js
+- prompt_log.md: prompt_log.md
+
+## My request:
+make the theme pink. light pink. the pink i have in my portfolio. and make it very cute
+```
+
+When asked for the portfolio URL or pink color, the user replied: “its ok just make it light pink”. Updated the surrounding page with blush backgrounds, rounded panels, pink controls and canvas frame, decorative hearts/stars, and control chips. Kept the underwater canvas rendering and gameplay unchanged for visibility. Whitespace validation passed; appearance has not been verified in a browser.
+
+## Phase 2 — Cute background pattern
+
+AI tool/model: Codex, GPT-6-based agent (exact model variant not exposed).
+
+User prompt (verbatim):
+
+```text
+# Context from my IDE setup:
+
+## Active file: game.js
+
+## Open tabs:
+- game.js: game.js
+- prompt_log.md: prompt_log.md
+
+## My request:
+make the background have something aesthetic and cute added so its not just plain pink
+```
+
+Added a subtle repeating SVG pattern of outlined bubbles, hearts, sparkles, and dots over the light-pink page gradients in style.css. No gameplay changes or external assets. Browser appearance remains unverified.

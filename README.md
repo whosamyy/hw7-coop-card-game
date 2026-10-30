@@ -1,146 +1,149 @@
-PS: This document contains AI-generated parts
-
 # Sonar Diver
 
-Sonar Diver is a browser-based, top-down underwater stealth game. The player dives from the surface into a procedurally generated basin, uses reflected sonar to navigate through darkness, finds a randomized access key, and reaches the rescue beacon while avoiding a giant squid and a tracking shark.
+Original game design and foundation: **kewuan-lyk**, the documented commit author of the [original repository](https://github.com/kewuan-lyk/-Jack-Li-.CoopCardGame). Phase 2 continuation: **whosamyy**. The original README does not identify a personal name, and the author's GitHub profile has no display name. This credit uses the verified author identity rather than guessing from a folder name; personal-name credit still needs confirmation before submission.
 
+Sonar Diver is a single-player underwater stealth game. You pilot a submarine through a random basin, find an access key, and escape through the rescue beacon. Sonar helps you navigate the dark, but it also tells the giant squid where you were. A slower shark keeps following you even when you stay quiet. Online co-op is part of the spec, but is not implemented.
 
-## 1. Installation and Running on Another Machine
-- A modern desktop web browser with HTML Canvas, Web Audio, and `CanvasRenderingContext2D.roundRect` support. Current versions of Chrome, Edge, Firefox, or Safari are recommended.
-- A keyboard.
-- No package manager, build step, account, or internet connection is required.
+This README was updated with Codex assistance and checked against the code. `spec.md` is the original source of truth and was left unchanged.
 
-1. Copy or clone the entire repository onto the machine.
-2. Keep `index.html`, `style.css`, and `game.js` in the same folder.
-3. Open `index.html` in a browser.
-4. Click the page or press any key once to allow the browser to start audio.
+## Running the game
 
-The game can run directly from the local file. If a browser blocks local scripts, run a basic local server from the repository folder and visit the URL it prints. For example, on a machine with Python 3:
+You need a desktop browser supporting Canvas, `roundRect`, and Web Audio, plus a keyboard. There are no packages to install or build steps.
+
+1. Keep `index.html`, `game.js`, and `style.css` together.
+2. Open `index.html` in Chrome or another compatible browser.
+3. Choose an ability and click **Start run**. The simulation waits until you start.
+4. Click the canvas after starting if the browser keeps keyboard focus on the button. Music requires a user interaction.
+
+If opening the file directly is blocked, run this from the repository folder:
 
 ```bash
 python3 -m http.server 8000
 ```
 
-Then open `http://localhost:8000`.
+Then visit `http://localhost:8000`. Python is only needed for this optional server.
 
+## Playing and controls
 
-## 2. Player Instructions
-
-Use WASD or arrow keys to move around
-Use SPACE to emit sonar to detect around
-Use M to mute or restore Music(Currently the music has some problems, I think you can add certain playlist from Spotify)
-Use R to restart the game
-
-1. Dive below the surface. At 10 meters, animated fog begins hiding most of the environment.
-2. Use sonar to reveal reefs, monsters, and nearby objects. Sonar rays bounce from walls, but each activation alerts the giant squid to the emission position.
-3. Follow the temporary yellow arrow to search for the access key. The arrow contains 8–22 degrees of intentional error and never shows distance.
-4. Collect the yellow key. The locked yellow rescue beacon then turns green.
-5. Reach the green beacon without touching either monster.
-
-### Monsters
-
-- **Giant squid:** Every sonar pulse alerts it, regardless of distance. It travels to the emission point and searches within 4 tiles for about 7 seconds. A newer sonar pulse replaces its target.
-- **Shark:** It continuously updates a path toward the submarine. It moves more slowly than the player but does not require sonar to begin chasing.
-
-Touching either monster immediately ends the run. Reaching the beacon without the key displays `ACCESS KEY REQUIRED`. After a win or loss, press R to generate a new map and restart.
-
-
-## 3. Acceptance Criteria Status
-
-
-| # | Criterion | Status | Evidence / Remaining Work |
-| --- | --- | --- | --- |
-| 1 | Movement and Collision | **Met** | Smooth keyboard movement and collision are handled by `updatePlayer`, `isWallAt`, and `canStandAt`. |
-| 2 | Random Map | **Met** | Each run generates a connected 52-by-48 basin, rolling seafloor, up to 23 reefs, and a reachable randomized beacon. |
-| 3 | Surface and Darkness | **Met** | The water surface, depth-based fog starting at 10 meters, and approximately 1.5-tile local visibility are implemented. |
-| 4 | Sonar Activation | **Met** | Space emits 72 sonar rays with an 8-tile maximum travel distance over about 0.8 seconds. |
-| 5 | Sonar Reflection | **Met** | Rays reflect from collision tiles and stop after at most three bounces. |
-| 6 | Reveal and Cooldown | **Met** | Reveals and sonar cooldown both use 1.5-second timers. |
-| 7 | Giant Squid | **Met** | The squid investigates every sonar source and searches nearby positions for about 7 seconds. |
-| 8 | Shark | **Met** | The shark continuously pathfinds toward the player every 0.65 seconds at a lower speed. |
-| 9 | Random Key | **Met** | A key is placed at a random valid open-water location each run and is collected on contact. |
-| 10 | Key Direction Hint | **Met** | Sonar displays a temporary yellow arrow with 8–22 degrees of error and no distance value. |
-| 11 | Locked Exit | **Met** | The beacon rejects the player without the key and changes from yellow to green after collection. |
-| 12 | Failure Condition | **Met** | Contact with either monster freezes gameplay and shows `GAME OVER`. |
-| 13 | Victory Condition | **Met** | Contact with the unlocked beacon freezes gameplay and shows `ESCAPE SUCCESSFUL`. |
-| 14 | Reset Function | **Met** | R generates a new map and resets the player, monsters, key, exit, sonar, fog, and result state. |
-| 15 | Audio | **Met** | Procedural urgent music starts after user interaction; M toggles mute. |
-
-
-| 16 | Online Co-op | **Not met** | There is no networking, lobby, server, or synchronized game state. |
-| 17 | Cooperative Escape | **Not met** | The current game supports one player only. Shared key and two-player escape rules are not implemented. |
-| 18 | Expanded Monster Roster | **Not met** | Giant squid and shark exist. Anglerfish, electric eel, and difficulty-based mixed spawning are not implemented. |
-| 19 | Appearance Customization | **Not met** | Hull colors, patterns, decorations, and a customization interface are not implemented. |
-| 20 | Abilities | **Not met** | Speed Boost, Short Blink, Emergency Shield, selection UI, and cooldown UI are not implemented. |
-| 21 | Difficulty Progression | **Not met** | Tutorial, Explorer, Deep Dive, Abyss, unlocks, and saved progression are not implemented. |
-
-
-## 4. Code Map
-
-### Files
-
-| File | Responsibility | Modify This File When... |
-| --- | --- | --- |
-| `index.html` | Page structure, canvas element, title, and visible control summary | Adding menus, customization UI, lobby UI, or new on-page instructions |
-| `style.css` | Responsive page layout and styling outside the canvas | Changing page size, typography, surrounding interface, or mobile layout |
-| `game.js` | Game state, generation, controls, AI, audio, rendering, collisions, and the main loop | Changing any current gameplay behavior |
-| `spec.md` | Full intended behavior, acceptance criteria, and priorities | Changing the designed rules or final product scope |
-| `README.md` | Setup, player instructions, implementation status, and developer handoff | Changing how the project runs or what is currently implemented |
-
-### Major Areas in `game.js`
-
-| Area / Functions | Responsibility |
+| Control | Action |
 | --- | --- |
-| Constants at the top of the file | Map size, viewport, player speed, sonar timing, monster sizes and speeds |
-| `generateSeafloor`, `generateMap`, `randomOpenTile` | Procedural seafloor, reef layout, exit placement, and valid random entity positions |
-| `playUrgentBeat`, `startMusic`, `toggleMusic` | Procedural background music and mute state |
-| `updatePlayer`, `updateCamera`, `isWallAt`, `canStandAt` | Movement, camera tracking, and world collision |
-| `placeKeyRandomly`, `drawKey`, `drawKeyGuidance` | Key placement, key rendering, collection guidance, and approximate direction arrow |
-| `createSonarRays`, `triggerSonar`, `updateSonar`, `drawSonarWaves` | Sonar creation, wall reflection, reveal timing, and visible wave trails |
-| `findPath` | Shared grid-based breadth-first pathfinding used by both monsters |
-| `sendMonsterTo`, `chooseSearchDestination`, `updateMonster` | Giant squid response to sonar and local search behavior |
-| `updateHunter`, `drawHunter` | Slow shark pursuit and rendering |
-| `checkGameOutcome`, `resetGame` | Key collection, locked exit, victory, defeat, and complete run reset |
-| `drawWater` through `drawVignette` | Water, surface, rocks, fog, particles, entities, HUD, and result rendering |
-| `gameLoop` | Frame timing and the update/render order; start here when tracing whole-game behavior |
+| WASD / arrow keys | Move and face that direction |
+| Space | Emit sonar; 1.5-second cooldown |
+| E | Activate the ability selected before starting |
+| M | Mute or restore procedural music |
+| R | Start a new random run after victory or defeat |
 
-There are currently no classes. State is stored in module-level objects such as `player`, `monster`, `hunter`, and `keyItem`.
+Dive into the basin and use the temporary yellow arrow from sonar to search for the key. The arrow is deliberately inaccurate and shows no distance. Collecting the key changes the beacon from yellow to green. Touch the green beacon to win. An unprotected collision with either monster loses the run.
 
+At 10 meters, fog hides most of the world except a small local light around the submarine. Sonar rays reflect off terrain and briefly reveal what they reach. The squid investigates the last sonar emission position, then searches nearby for seven seconds. A new pulse redirects it. The shark continuously pathfinds toward you.
 
-## 5. Next Steps in Priority Order
+### Abilities
 
-1. **Split `game.js` into modules before adding major systems.** Separate map generation, entities, sonar, rendering, audio, and game state so networking does not have to synchronize one monolithic file.
-2. **Add deterministic map seeds and runtime validation.** A seed is necessary for two online clients to generate the same map and for developers to reproduce failures.
-3. **Build the two-player networking foundation.** Define the server-authoritative state, room joining, player identity, synchronized movement, sonar events, monsters, key collection, and result state.
-4. **Implement cooperative escape rules.** Add a second player, shared key state, two-player beacon completion, disconnect handling, and team failure behavior.
-5. **Add ability architecture and UI.** Implement one reusable ability interface, then Speed Boost, Short Blink, and Emergency Shield with server-validated cooldowns.
-6. **Add difficulty configuration.** Move map density, monster count, reveal time, hint availability, and cooldown values into difficulty presets.
-7. **Add anglerfish and electric eel AI.** Reuse the pathfinding and entity interfaces after the monster system has been separated from global state.
-8. **Add appearance customization.** Synchronize hull color, pattern, and decoration after multiplayer entity rendering is stable.
-9. **Polish animation and audio.** Replace placeholder Canvas shapes and procedural tones with authored or licensed assets only after the complete game loop is reliable.
+Choose one ability before the first run. Press E to activate it; the text above the canvas shows readiness, active state, or cooldown.
 
+| Ability | Effect | Cooldown |
+| --- | --- | --- |
+| Speed Boost | 1.8 times normal movement speed for 2 seconds; normal terrain collision still applies | 10 seconds |
+| Short Blink | Teleport up to 3 tiles in the facing direction, using the furthest valid whole-tile landing along a clear route | 15 seconds on success |
+| Emergency Shield | Ignore one monster contact within a 2-second activation window | 20 seconds |
 
-## 6. Known Bugs, Limitations, and Traps
+Cooldowns start on activation. Blink tries a shorter landing if needed; if no one-, two-, or three-tile landing along the open route exists, nothing moves and no cooldown is consumed. The spec does not explicitly say whether Blink crosses walls; this version interprets “open tiles” as requiring a clear route.
 
-- **Browser compatibility:** The renderer uses `roundRect` and Web Audio. Older browsers may fail or lose visual/audio features.
-- **Audio autoplay:** Music cannot begin until the player clicks or presses a key because browsers block automatic audio. This is expected behavior.
-- **Fixed internal canvas resolution:** CSS scales the 1120-by-680 canvas to fit the page, but the internal resolution does not change when the window changes size. Very small windows shrink the game and make details harder to see.
-- **Keyboard only:** There are no touch, controller, or remappable controls.
-- **Non-reproducible maps:** Generation uses `Math.random` and does not expose a seed. A broken or unusually difficult layout cannot currently be recreated from a run ID.
-- **No runtime connectivity retry:** Reef spacing makes connected maps likely and batch simulation has passed, but the browser does not run a final flood-fill validation and regenerate if a disconnected map is produced.
-- **Approximate sonar physics:** Reflection uses small collision steps against square grid tiles. At tight corners, several rays may reverse sharply or disappear after reaching the three-bounce limit.
-- **AI scaling:** The shark recalculates breadth-first search every 0.65 seconds. This is acceptable for two monsters, but adding many monsters without shared path data may cause frame drops.
-- **Global mutable state:** Most systems directly read and change module-level objects. Functions may look reusable but often depend on globals such as `level`, `camera`, `gameState`, and the canvas contexts.
-- **No pause state:** Switching tabs clears held movement keys, but the game simulation and music continue running.
-- **No automated browser tests:** Syntax and map-generation checks have been run manually, but input, audio, animation, AI, and outcome screens do not have automated integration tests.
+Shield is consumed by one contact, not two seconds of invulnerability. The existing collision system checks every frame, so staying overlapped can kill you on the next frame. If both monsters touch you together, Shield blocks one contact and the other causes defeat. These are the chosen interpretations of unspecified repeated/simultaneous contact behavior.
 
+After a result, R keeps the chosen ability and resets its timers along with the rest of the run. Reload the page to choose another ability. E cannot activate an ability before starting, during cooldown, or after a result.
 
-## 7. Shortcuts and Why They Were Taken
+## Phase 2 changes
 
-- **Single `game.js` file:** Keeping all code together made the classroom prototype faster to build and hand off, but it should be modularized before networking or additional levels.
-- **Canvas-drawn placeholder art:** The submarine, shark, squid, reefs, key, and beacon use geometric Canvas shapes. This avoided an asset pipeline while the gameplay rules were changing.
-- **Procedural music:** Web Audio oscillators provide urgency without downloading, licensing, or packaging music. The result is functional but less polished than an authored soundtrack.
-- **Simplified sonar:** Sonar uses 72 simulated rays and grid collision instead of physically accurate underwater acoustics. This makes reflections visible while keeping the calculation small enough for the browser.
-- **Separated elliptical reefs:** The generator spaces reef formations apart instead of building a fully general maze. This reduces the chance of unreachable regions and leaves room to evade monsters.
-- **Simple breadth-first pathfinding:** Both monsters use the same grid BFS rather than navigation meshes or hierarchical pathfinding. It is easy to understand and sufficient for the current map size and monster count.
-- **No saved progression:** Refreshing the page loses all state. Persistence was deferred because the current prototype has only one playable difficulty.
+- Fixed the squid's search timer to start on arrival, including long investigations, and limited search destinations to four tiles from the sound source.
+- Froze gameplay and the final rendered frame after either result, including sonar and reveal updates. R still works.
+- Added pre-run ability selection, E activation, status text, Boost, Blink, and Shield.
+
+The original functions, shared state objects, map generator, rendering, and BFS pathfinding remain in place. Changes extend the inherited architecture rather than replacing it.
+
+## Acceptance criteria report
+
+**Met means implemented based on code inspection and the Node checks described below. It does not mean manually verified in a browser.** The table covers all 21 original criteria. Criteria 12 and 13 are read together with the specified Shield exception.
+
+| # | Requirement | Status | Current result / remaining work |
+| --- | --- | --- | --- |
+| 1 | Smooth movement and terrain collision | Met | Existing normalized keyboard movement and collision checks remain; Node checks covered normal/boosted movement and terrain. Browser feel still needs checking. |
+| 2 | Connected random 52×48 map, uneven floor, up to 23 reefs, reachable beacon | Met | Generator implements these features. All 100 maps sampled in the initial Node audit were connected with reachable key and beacon; generation has no final connectivity validation. |
+| 3 | Surface and animated darkness from 10 m, about 1.5 tiles of local light | Met | Surface, depth threshold, fog, and irregular local light are implemented. Visual quality is code-inspected only. |
+| 4 | 72 sonar rays, 8-tile travel in about 0.8 seconds | Met | Ray count and controlled travel distance/timing passed Node checks. Visible rendering needs Chrome verification. |
+| 5 | Sonar reflection with at most three continued bounces | Met | Collision logic reflects rays and stops them at the next collision after three bounces. Corner behavior remains visually unverified. |
+| 6 | 1.5-second reveals and sonar cooldown | Met | Reveal timers/fading are implemented; cooldown passed Node checks. Visual fading still needs checking. |
+| 7 | Squid investigates sonar, then searches within 4 tiles for about 7 seconds | Met | Arrival starts the search window; new sonar replaces the target. Near/far travel, interruptions, timing, and destination bounds passed Node checks. |
+| 8 | Slower shark pursues with roughly 0.65-second route updates | Met | BFS pursuit and speed 72 versus squid 112 and player 190 remain. Route timer checked in Node; an empty path triggers earlier recalculation. |
+| 9 | Random reachable key collected on contact | Met | Sampled maps had reachable keys; collection passed Node checks. |
+| 10 | Temporary yellow key arrow, 8–22° error, no distance | Met | Direction/error calculation and temporary rendering are implemented. Appearance is not browser-verified. |
+| 11 | Locked beacon message; key unlocks yellow beacon to green | Met | Locked rejection and key collection passed Node checks; message and color branches were inspected. |
+| 12 | Monster collision freezes gameplay and shows GAME OVER | Met | Both monsters cause defeat unless Shield blocks the contact. Node checks confirmed result text and unchanged simulation/render calls afterward. |
+| 13 | Key plus beacon freezes gameplay and shows ESCAPE SUCCESSFUL | Met | Victory and freeze passed Node checks; unprotected monster contact still takes priority. |
+| 14 | R regenerates map/entities and resets gameplay | Met | R handler, fresh maps, cleared sonar/key/results, reset ability timers, and resumed movement passed Node checks. Selection and mute preference persist. |
+| 15 | Procedural music after interaction; M toggles mute | Met | Web Audio rhythm, drones, interaction startup, and mute handler exist. Audio has not been heard/tested in Chrome; the inherited README mentioned unspecified music problems. |
+| 16 | Online two-player synchronization | Not Met | No networking, rooms, server, or second player. Deferred to keep Phase 2 focused on a complete single-player loop. |
+| 17 | Shared key and two-player escape/team-loss rules | Not Met | Single-player outcomes only; depends on #16. |
+| 18 | Squid, shark, anglerfish, eel, and mixed higher-difficulty encounters | Partial | Squid and shark exist; anglerfish, eel, and variable mixed spawning are missing. Deferred with difficulty work. |
+| 19 | Hull color, pattern, and decoration selection shared between players | Not Met | Fixed submarine appearance; no customization or synchronization. Cosmetics were lower priority than gameplay. |
+| 20 | Select Boost, Blink, or Shield with specified effects and cooldowns | Met | All three are selectable and passed Node logic checks, including invalid Blink, Shield consumption, cooldowns, end-state blocking, and reset. Interpretations are documented above; browser verification remains. |
+| 21 | Tutorial, Explorer, Deep Dive, Abyss, and sequential unlocks | Not Met | One fixed configuration, no selection, progression, or unlocks. Deferred within the limited Phase 2 scope. |
+
+## Testing and remaining manual checks
+
+During Phase 2, Codex ran JavaScript syntax checks and temporary Node harnesses with stubbed DOM/Canvas APIs. These were one-off commands, not a committed automated test suite. No real Chrome playthrough was completed: browser automation failed to initialize, and the initial local server attempt was blocked by the environment.
+
+The executed Node checks passed for sampled map connectivity, movement/collision, sonar count/travel/cooldown, squid arrival/search and interruption, shark route timing, key and beacon logic, both losses, victory, frozen outcomes, restart, and all three abilities. Some scenarios used controlled maps or moved entities directly in memory. Canvas calls and text were checked with stubs; that does not verify actual pixels, audio, or browser input behavior.
+
+Before submission, manually check in Chrome:
+
+1. Choose each ability on separate page loads and start the game. Check controls, status text, and browser console errors.
+2. Move normally and with Boost into reefs, sides, and the seafloor. Check Boost's two-second duration and ten-second cooldown.
+3. Blink straight and diagonally, near obstacles and boundaries. Check shortened/failed teleports, no cooldown on failure, and fifteen seconds on success.
+4. Test Shield against both monsters, expiry, repeated overlap, and its twenty-second cooldown. It should block only one contact.
+5. Dive past 10 m, inspect fog and reflected sonar, and check temporary reveals and the inaccurate yellow arrow.
+6. Observe squid redirection and a full seven-second search after a long journey; confirm shark pursuit.
+7. Test the locked beacon, key collection, unlocked victory, and both defeats. Trigger sonar near an outcome and confirm the final scene freezes. E must do nothing after a result; R must restore a playable run.
+8. Listen for music after interaction, toggle M, and check the layout at a smaller window size. Finish at least one run normally.
+
+## Code structure
+
+| File | Purpose |
+| --- | --- |
+| `index.html` | Canvas, pre-run ability selector, Start button, status text, and controls |
+| `style.css` | Page styling and responsive canvas scaling |
+| `game.js` | All game state, generation, movement, abilities, AI, audio, rendering, and frame loop |
+| `spec.md` | Unchanged original rules and 21 acceptance criteria |
+| `README.md` | Run instructions, implementation report, testing limits, and code map |
+| `prompt_log.md` | Inherited AI history and Phase 2 prompts/process |
+
+There are no classes or modules. State lives in top-level objects such as `player`, `monster`, `hunter`, and `keyItem`.
+
+| Functions / state | Responsibility and extension point |
+| --- | --- |
+| `generateSeafloor`, `generateMap`, `randomOpenTile` | Terrain and random entity placement; extend here for validated generation or difficulty settings |
+| `isWallAt`, `canStandAt`, `updatePlayer`, `updateCamera` | Collision, normal/boosted movement, heading, and following camera |
+| `abilityDefinitions`, `activateAbility`, `updateAbilityStatus` | Ability values, E effects, status, and selection handler |
+| `createSonarRays`, `triggerSonar`, `updateSonar` | Pulse creation, reflection, reveals, cooldown, and squid alerts |
+| `findPath` | Shared grid BFS used by both monsters |
+| `sendMonsterTo`, `chooseSearchDestination`, `updateMonster` | Squid investigation, arrival-based search, and idle transition |
+| `updateHunter` | Shark pursuit |
+| `placeKeyRandomly`, `checkGameOutcome`, `resetGame` | Key placement/collection, Shield consumption, beacon, results, and new runs |
+| `startMusic`, `playUrgentBeat`, `toggleMusic` | Web Audio startup, rhythm, and mute |
+| `draw…` functions, `gameLoop` | Canvas presentation and update/render order; completed outcomes preserve the final frame |
+
+## Known limits and shortcuts
+
+- No online co-op, progression, customization, anglerfish, or eel. Reloading loses state.
+- Random generation uses `Math.random`; there is no reproducible seed or final flood-fill/retry. Passing sampled maps is not a guarantee for every run.
+- Monster navigation uses tile centers without checking the full monster radius. Large sprites can overlap reef edges, and contact checks do not test for an intervening wall. These need visual investigation.
+- Sonar uses stepped grid reflection rather than physical acoustics. Tight corners can produce abrupt direction changes. Frame-time clamping can stretch travel timing under slow/background rendering.
+- No pause menu. Losing focus clears movement keys, but a playing run can continue; wall-clock ability timers can expire in the background. Music also continues after results.
+- Shield's single-frame protection can be hard to use because continued overlap is lethal. This is documented behavior, not a two-second immunity effect.
+- R restarts immediately with the same ability. Changing ability requires reloading.
+- Fixed 1120×680 internal resolution is scaled by CSS. Small windows shrink details. Keyboard input, focus, and audio need real browser testing.
+- Canvas shapes, procedural tones, shared global state, and simple BFS were kept to preserve the inherited foundation and avoid an asset/build pipeline. There are no persistent automated tests.
+
+## What to do next
+
+First finish the Chrome checks above and address any confirmed problems with the core loop. After that, follow the spec's secondary priorities: online synchronization and cooperative escape, difficulty progression, then anglerfish/eel encounters. Cosmetics and extra visual/audio polish come last. Add connectivity validation and reproducible map data when preparing synchronization. Keep changes small rather than starting with a full rewrite.
