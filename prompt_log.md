@@ -1190,3 +1190,78 @@ make the background have something aesthetic and cute added so its not just plai
 ```
 
 Added a subtle repeating SVG pattern of outlined bubbles, hearts, sparkles, and dots over the light-pink page gradients in style.css. No gameplay changes or external assets. Browser appearance remains unverified.
+
+## Phase 2 — Pochacco wallpaper
+
+AI tool/model: Codex, GPT-6-based agent (exact variant not exposed), with the built-in image generation tool.
+
+User prompt (verbatim):
+
+```text
+# Context from my IDE setup:
+
+## Active file: game.js
+
+## Open tabs:
+- game.js: game.js
+- prompt_log.md: prompt_log.md
+
+## My request:
+the pink background should be full of cute pochaccos
+```
+
+Generated artwork was inspected and copied into assets/pochacco-pink-pattern.png, then referenced as a repeating 420px CSS page background. Gameplay and the game panel remain unchanged. Browser appearance has not been verified.
+
+Image generation prompt:
+
+```text
+Use case: illustration-story. Asset type: seamless square repeating website wallpaper tile. Create a very cute light blush pink (#fff1f6) background filled with small Pochacco characters, the white puppy with floppy black ears, black dot eyes, little black oval nose. Multiple playful seated, waving and peeking poses, soft pink cheeks, some wearing tiny pastel pink shirts. Flat clean kawaii sticker illustration, delicate outlines, scattered tiny pink hearts and sparkles. Airy evenly distributed pattern, recognizable Pochacco, gentle pastel palette, no text no watermark. Seamlessly tileable edges. This will be repeated at 420px wide behind a game panel.
+```
+
+## Phase 2 — Softer, sparser Pochacco background
+
+AI tool/model: Codex (GPT-6-based agent, exact variant not exposed) and built-in image generation.
+
+User request (verbatim):
+
+```text
+# Context from my IDE setup:
+
+## Active file: game.js
+
+## Open tabs:
+- game.js: game.js
+- prompt_log.md: prompt_log.md
+
+## My request:
+nonono its a little too much. make it less and also maybe smaller so they're farther apart. and make it a little more faded
+```
+
+Edited the wallpaper with the built-in image tool, inspected the result, and saved assets/pochacco-pink-pattern-soft.png. CSS now repeats the sparse image at 540px. The original asset remains. Browser appearance is not verified.
+
+Image edit prompt:
+
+```text
+Edit this repeating pink website wallpaper to be MUCH quieter and sparser. Keep the same cute Pochacco illustration style and uniform very pale blush pink background #fff1f6. Only SIX small Pochacco figures distributed evenly across the entire square, each around 10 percent of image width, with large empty pink spaces between them. Substantially smaller characters than the reference. Fade all character artwork and outlines to a delicate low-contrast pastel, as if at 25 percent opacity over the pink. Very few tiny faint hearts. No text. Seamless repeat tile.
+```
+
+## Phase 2 — Smaller wallpaper characters and mixed decorations
+
+AI tool/model: Codex, GPT-6-based agent (exact model variant not exposed).
+
+User prompt (verbatim):
+
+```text
+# Context from my IDE setup:
+
+## Active file: game.js
+
+## Open tabs:
+- game.js: game.js
+- prompt_log.md: prompt_log.md
+
+## My request:
+make it small but still filling up the whole pink background. and maybe add some other aesthetic cute decorations like hearts as well so its not just all pochaccos
+```
+
+Reduced the existing soft wallpaper repeat from 540px to 360px, making characters smaller while repeating across the entire page background. Added an independent repeating layer of faint SVG hearts, sparkles, and dots. Gameplay unchanged. Whitespace validation passed; browser appearance not verified.
